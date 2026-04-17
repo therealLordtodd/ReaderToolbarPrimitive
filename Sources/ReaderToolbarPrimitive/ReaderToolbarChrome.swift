@@ -1,42 +1,8 @@
 import SwiftUI
 import ReaderChromeThemePrimitive
+import ReaderSidebarPrimitive
 
-public enum ReaderToolbarAnnotationPane: String, CaseIterable, Sendable {
-    case none
-    case highlights
-    case comments
-    case bookmarks
-
-    public var title: String {
-        switch self {
-        case .none:
-            return "None"
-        case .highlights:
-            return "Highlights"
-        case .comments:
-            return "Comments"
-        case .bookmarks:
-            return "Bookmarks"
-        }
-    }
-
-    public var systemImage: String {
-        switch self {
-        case .none:
-            return "sidebar.trailing"
-        case .highlights:
-            return "highlighter"
-        case .comments:
-            return "text.bubble"
-        case .bookmarks:
-            return "bookmark"
-        }
-    }
-
-    public func toggled(from activePane: ReaderToolbarAnnotationPane) -> ReaderToolbarAnnotationPane {
-        activePane == self ? .none : self
-    }
-}
+public typealias ReaderToolbarAnnotationPane = ReaderSidebarPane
 
 public struct ReaderToolbarChrome: ToolbarContent {
     @Binding public var activeAnnotationPane: ReaderToolbarAnnotationPane

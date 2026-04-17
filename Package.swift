@@ -17,12 +17,14 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../ReaderChromeThemePrimitive"),
+        .package(path: "../ReaderSidebarPrimitive"),
     ],
     targets: [
         .target(
             name: "ReaderToolbarPrimitive",
             dependencies: [
                 .product(name: "ReaderChromeThemePrimitive", package: "ReaderChromeThemePrimitive"),
+                .product(name: "ReaderSidebarPrimitive", package: "ReaderSidebarPrimitive"),
             ]
         ),
         .testTarget(
