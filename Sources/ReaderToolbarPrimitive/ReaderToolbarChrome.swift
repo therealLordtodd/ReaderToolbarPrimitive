@@ -8,7 +8,10 @@ public struct ReaderToolbarChrome: ToolbarContent {
     @Binding public var activeAnnotationPane: ReaderToolbarAnnotationPane
 
     public var theme: ReaderChromeTheme
+    public var annotationPanes: [ReaderToolbarAnnotationPane]
     public var isStudioVisible: Bool
+    public var showSearchControl: Bool
+    public var showStudioControl: Bool
     public var showTranslationControl: Bool
     public var searchHelp: String
     public var onSearchRequested: () -> Void
@@ -24,7 +27,10 @@ public struct ReaderToolbarChrome: ToolbarContent {
     public init<ChapterControl: View, AppearanceControl: View, InfoControl: View, ReadAloudControl: View, ReadingSpeedControl: View, TranslationControl: View>(
         activeAnnotationPane: Binding<ReaderToolbarAnnotationPane>,
         theme: ReaderChromeTheme,
+        annotationPanes: [ReaderToolbarAnnotationPane] = [.bookmarks, .highlights, .comments],
         isStudioVisible: Bool,
+        showSearchControl: Bool = true,
+        showStudioControl: Bool = true,
         showTranslationControl: Bool,
         searchHelp: String,
         onSearchRequested: @escaping () -> Void,
@@ -38,7 +44,10 @@ public struct ReaderToolbarChrome: ToolbarContent {
     ) {
         self._activeAnnotationPane = activeAnnotationPane
         self.theme = theme
+        self.annotationPanes = annotationPanes
         self.isStudioVisible = isStudioVisible
+        self.showSearchControl = showSearchControl
+        self.showStudioControl = showStudioControl
         self.showTranslationControl = showTranslationControl
         self.searchHelp = searchHelp
         self.onSearchRequested = onSearchRequested
@@ -68,9 +77,9 @@ public struct ReaderToolbarChrome: ToolbarContent {
             Spacer()
                 .frame(width: theme.spacing.control)
 
-            annotationButton(for: .bookmarks, help: "Toggle bookmarks panel")
-            annotationButton(for: .highlights, help: "Toggle highlights panel (\u{2318}L)")
-            annotationButton(for: .comments, help: "Toggle comments panel (\u{2318}N)")
+            ForEach(annotationPanes, id: \.self) { pane in
+                annotationButton(for: pane, help: helpText(for: pane))
+            }
 
             readAloudControl
                 .font(theme.typography.title3)
@@ -86,20 +95,24 @@ public struct ReaderToolbarChrome: ToolbarContent {
                     .frame(height: Self.toolbarItemHeight)
             }
 
-            Button(action: onSearchRequested) {
-                Label("Search", systemImage: "magnifyingglass")
+            if showSearchControl {
+                Button(action: onSearchRequested) {
+                    Label("Search", systemImage: "magnifyingglass")
+                }
+                .help(searchHelp)
+                .font(theme.typography.title3)
+                .frame(height: Self.toolbarItemHeight)
             }
-            .help(searchHelp)
-            .font(theme.typography.title3)
-            .frame(height: Self.toolbarItemHeight)
 
-            Button(action: onStudioToggle) {
-                Label("Studio", systemImage: "brain")
+            if showStudioControl {
+                Button(action: onStudioToggle) {
+                    Label("Studio", systemImage: "brain")
+                }
+                .help("Toggle Studio (\u{2318}J)")
+                .font(theme.typography.title3)
+                .frame(height: Self.toolbarItemHeight)
+                .foregroundStyle(isStudioVisible ? theme.colors.infoTint : theme.colors.primaryText)
             }
-            .help("Toggle Studio (\u{2318}J)")
-            .font(theme.typography.title3)
-            .frame(height: Self.toolbarItemHeight)
-            .foregroundStyle(isStudioVisible ? theme.colors.infoTint : theme.colors.primaryText)
         }
     }
 
@@ -113,6 +126,21 @@ public struct ReaderToolbarChrome: ToolbarContent {
         .font(theme.typography.title3)
         .frame(height: Self.toolbarItemHeight)
         .foregroundStyle(activeAnnotationPane == pane ? theme.colors.infoTint : theme.colors.primaryText)
+    }
+
+    private func helpText(for pane: ReaderToolbarAnnotationPane) -> String {
+        switch pane {
+        case .none:
+            return "Hide annotation panels"
+        case .all:
+            return "Toggle all annotations panel"
+        case .highlights:
+            return "Toggle highlights panel"
+        case .comments:
+            return "Toggle comments panel"
+        case .bookmarks:
+            return "Toggle bookmarks panel"
+        }
     }
 
     private static let toolbarItemHeight: CGFloat = 38

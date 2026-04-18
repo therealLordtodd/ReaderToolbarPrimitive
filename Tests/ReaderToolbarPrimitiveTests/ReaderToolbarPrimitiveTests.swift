@@ -15,7 +15,10 @@ import SwiftUI
     _ = ReaderToolbarChrome(
         activeAnnotationPane: activePane,
         theme: .default,
+        annotationPanes: [.all, .highlights, .comments, .bookmarks],
         isStudioVisible: false,
+        showSearchControl: true,
+        showStudioControl: false,
         showTranslationControl: true,
         searchHelp: "Find in book",
         onSearchRequested: {},
