@@ -67,10 +67,10 @@ struct CustomReaderView: View {
             activePane: $activePane,
             isStudioVisible: $isStudioVisible
         )
+        .readerChromeTheme(.dark)
         .toolbar {
             ReaderToolbarChrome(
                 activeAnnotationPane: $activePane,
-                theme: .default,
                 annotationPanes: ReaderSidebarPane.standardAnnotationPanes,
                 isStudioVisible: isStudioVisible,
                 showSearchControl: true,
@@ -87,10 +87,11 @@ struct CustomReaderView: View {
                 translationControl: { TranslationStatusView() }
             )
         }
-        .readerChromeTheme(.default)
     }
 }
 ```
+
+`ReaderToolbarChrome` now resolves its theme from the surrounding `readerChromeTheme` environment by default. Pass `theme:` only when you need a one-off override that should differ from the rest of the reader chrome.
 
 ### Hiding controls the host does not provide
 
@@ -99,7 +100,6 @@ Every control slot is required, but the host can provide `EmptyView()` for slots
 ```swift
 ReaderToolbarChrome(
     activeAnnotationPane: $activePane,
-    theme: .default,
     isStudioVisible: false,
     showSearchControl: true,
     showStudioControl: false,       // hides studio button

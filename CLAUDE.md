@@ -25,7 +25,7 @@
 - **Host injects, primitive arranges.** The toolbar does not own the content of its six control slots — hosts inject `ChapterControl`, `AppearanceControl`, etc. The primitive owns layout, spacing, and theming across those slots.
 - **Pane state is bound, not owned.** The annotation-pane toggles are driven by `Binding<ReaderToolbarAnnotationPane>`. The host (or `ReaderKit`) owns pane state so the toolbar and sidebar stay in sync.
 - **Keep this package focused on reusable reader toolbar chrome.** Host-specific popover internals, menu bodies, or product-specific control content do not belong here.
-- **All theme access is via environment.** The toolbar reads `@Environment(\.readerChromeTheme)` indirectly through its sub-views; hosts inject the theme via `.readerChromeTheme(_:)` on the parent view.
+- **Theme is environment-first, with an explicit override escape hatch.** Hosts normally inject `readerChromeTheme` on the parent view and let the toolbar inherit it. The `theme:` parameter exists for one-off overrides when a toolbar should intentionally diverge from the surrounding reader chrome.
 
 ## Primary Documentation
 

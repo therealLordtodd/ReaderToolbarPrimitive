@@ -7,7 +7,7 @@ public typealias ReaderToolbarAnnotationPane = ReaderSidebarPane
 public struct ReaderToolbarChrome: ToolbarContent {
     @Binding public var activeAnnotationPane: ReaderToolbarAnnotationPane
 
-    public var theme: ReaderChromeTheme
+    public var theme: ReaderChromeTheme?
     public var annotationPanes: [ReaderToolbarAnnotationPane]
     public var isStudioVisible: Bool
     public var showSearchControl: Bool
@@ -24,9 +24,11 @@ public struct ReaderToolbarChrome: ToolbarContent {
     private let readingSpeedControl: AnyView
     private let translationControl: AnyView
 
+    @Environment(\.readerChromeTheme) private var environmentTheme
+
     public init<ChapterControl: View, AppearanceControl: View, InfoControl: View, ReadAloudControl: View, ReadingSpeedControl: View, TranslationControl: View>(
         activeAnnotationPane: Binding<ReaderToolbarAnnotationPane>,
-        theme: ReaderChromeTheme,
+        theme: ReaderChromeTheme? = nil,
         annotationPanes: [ReaderToolbarAnnotationPane] = [.bookmarks, .highlights, .comments],
         isStudioVisible: Bool,
         showSearchControl: Bool = true,
@@ -63,35 +65,35 @@ public struct ReaderToolbarChrome: ToolbarContent {
     public var body: some ToolbarContent {
         ToolbarItemGroup {
             chapterControl
-                .font(theme.typography.title3)
+                .font(resolvedTheme.typography.title3)
                 .frame(height: Self.toolbarItemHeight)
 
             appearanceControl
-                .font(theme.typography.title3)
+                .font(resolvedTheme.typography.title3)
                 .frame(height: Self.toolbarItemHeight)
 
             infoControl
-                .font(theme.typography.title3)
+                .font(resolvedTheme.typography.title3)
                 .frame(height: Self.toolbarItemHeight)
 
             Spacer()
-                .frame(width: theme.spacing.control)
+                .frame(width: resolvedTheme.spacing.control)
 
             ForEach(annotationPanes, id: \.self) { pane in
                 annotationButton(for: pane, help: helpText(for: pane))
             }
 
             readAloudControl
-                .font(theme.typography.title3)
+                .font(resolvedTheme.typography.title3)
                 .frame(height: Self.toolbarItemHeight)
 
             readingSpeedControl
-                .font(theme.typography.title3)
+                .font(resolvedTheme.typography.title3)
                 .frame(height: Self.toolbarItemHeight)
 
             if showTranslationControl {
                 translationControl
-                    .font(theme.typography.title3)
+                    .font(resolvedTheme.typography.title3)
                     .frame(height: Self.toolbarItemHeight)
             }
 
@@ -100,7 +102,7 @@ public struct ReaderToolbarChrome: ToolbarContent {
                     Label("Search", systemImage: "magnifyingglass")
                 }
                 .help(searchHelp)
-                .font(theme.typography.title3)
+                .font(resolvedTheme.typography.title3)
                 .frame(height: Self.toolbarItemHeight)
             }
 
@@ -109,9 +111,9 @@ public struct ReaderToolbarChrome: ToolbarContent {
                     Label("Studio", systemImage: "brain")
                 }
                 .help("Toggle Studio (\u{2318}J)")
-                .font(theme.typography.title3)
+                .font(resolvedTheme.typography.title3)
                 .frame(height: Self.toolbarItemHeight)
-                .foregroundStyle(isStudioVisible ? theme.colors.infoTint : theme.colors.primaryText)
+                .foregroundStyle(isStudioVisible ? resolvedTheme.colors.infoTint : resolvedTheme.colors.primaryText)
             }
         }
     }
@@ -123,9 +125,13 @@ public struct ReaderToolbarChrome: ToolbarContent {
             Label(pane.title, systemImage: pane.systemImage)
         }
         .help(help)
-        .font(theme.typography.title3)
+        .font(resolvedTheme.typography.title3)
         .frame(height: Self.toolbarItemHeight)
-        .foregroundStyle(activeAnnotationPane == pane ? theme.colors.infoTint : theme.colors.primaryText)
+        .foregroundStyle(
+            activeAnnotationPane == pane
+                ? resolvedTheme.colors.infoTint
+                : resolvedTheme.colors.primaryText
+        )
     }
 
     private func helpText(for pane: ReaderToolbarAnnotationPane) -> String {
@@ -144,4 +150,8 @@ public struct ReaderToolbarChrome: ToolbarContent {
     }
 
     private static let toolbarItemHeight: CGFloat = 38
+
+    private var resolvedTheme: ReaderChromeTheme {
+        theme ?? environmentTheme
+    }
 }
